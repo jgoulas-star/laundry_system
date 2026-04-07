@@ -1,66 +1,175 @@
 <?php
-$washers = ["available", "inuse", "outoforder", "available", "inuse", "outoforder", "inuse"];
-$dryers = ["outoforder", "available", "inuse", "available", "outoforder", "available", "inuse"];
-
-function displayMachines($machines, $type) {
-    echo "<div class='machine-container'>";
-    
-    for ($i = 0; $i < count($machines); $i++){
-        
-        $status = $machines[$i];
-        
-        if($status == "available"){
-            $text = "Available";
-            $color = "green";
-            $img = "available.png";
-        } elseif ($status == "inuse") {
-            $text = "In Use";
-            $color = "red";
-            $img = "inuse.png";
-        } else {
-            $text = "Out Of Order";
-            $color = "gray";
-            $img = "outoforder.png";
-        } 
-                
-        echo "
-        <div class='machine'>
-            <img src='images/$img' alt='machine'>
-            <p>$type Machine " . ($i + 1) . "</p>
-            <p style='color:$color;'>$text</p>
-        </div>
-        ";         
-    }
-    
-    echo "</div>";
-}
 ?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Laundry System</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        
-        <h1>Laundry Machine System</h1>
-        
-        <form method="post">
-            <button name="view" value="washers">View Washing Machines</button>
-            <button name="view" value="dryers">View Drying Machines</button>
-        </form>
-        
-        <hr>
-        
-        <?php
-        if (isset($_POST['view'])) {
-            if ($_POST['view'] == 'washers') {
-                displayMachines($washers, "Washing");
-            } elseif ($_POST['view']== 'dryers') {
-                displayMachines($dryers, "Drying"); 
-            }
-        }
-        ?>  
-    </body>
+<head>
+<title>Admin Dashboard</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    margin:0;
+    background: url('images/laundry.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Header */
+.header{
+    background-color:#2c3e50;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:28px;
+}
+
+/* Layout */
+.container{
+    display:flex;
+}
+
+/* Sidebar (Buildings) */
+.sidebar{
+    width:200px;
+    background:#34495e;
+    color:white;
+    height:100vh;
+    padding-top:20px;
+}
+
+.sidebar h3{
+    text-align:center;
+}
+
+.sidebar a{
+    display:block;
+    color:white;
+    padding:12px;
+    margin:5px;
+    text-decoration:none;
+    background:#2c3e50;
+    text-align:center;
+    border-radius:5px;
+}
+
+.sidebar a:hover{
+    background:#1abc9c;
+}
+
+/* Main content */
+.main{
+    flex:1;
+    padding:20px;
+}
+
+/* Machine cards */
+.machine-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:15px;
+}
+
+.machine-card{
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    box-shadow:0px 2px 5px rgba(0,0,0,0.2);
+}
+
+.status{
+    margin-top:10px;
+    font-weight:bold;
+}
+
+.available{
+    color:green;
+}
+
+.inuse{
+    color:orange;
+}
+
+.out{
+    color:red;
+}
+
+/* Buttons */
+button{
+    margin-top:10px;
+    padding:5px 10px;
+}
+.machine-img{
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 10px auto;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    Laundry System - Admin Dashboard
+</div>
+
+<div class="container">
+
+    <!-- Sidebar (Buildings) -->
+    <div class="sidebar">
+        <h3>Buildings</h3>
+        <a href="Townhouses.php">
+            <button type="button">Townhouses</button>
+        </a>
+        <a href="Aubuchon_hall.php">
+            <button type="button">Aubuchon Hall</button>
+        </a>
+        <a href="Russell_tower.php">
+            <button type="button">Russell Towers</button>
+        </a>
+        <a href="Mara_village.php">
+            <button type="button">Mara Village</button>
+        </a>
+    </div>
+
+    <!-- Main Section -->
+    <div class="main">
+
+        <h2>DashBoard</h2>
+
+        <div class="machine-grid">
+
+            <div class="machine-card">
+                <h3>Washer W1</h3>
+                <img src="images/available.png" class="machine-img" alt="Wahser">
+                <p class="status available">Available</p>
+                <button>Update</button>
+                <button>Remove</button>
+            </div>
+
+            <div class="machine-card">
+                <h3>Dryer D1</h3>
+                <img src="images/inuse.png" class="machine-img" alt="Dryer">
+                <p class="status inuse">In Use</p>
+                <button>Update</button>
+                <button>Remove</button>
+            </div>
+
+            <div class="machine-card">
+                <h3>Washer W2</h3>
+                <img src="images/outoforder.png" class="machine-img" alt="machine">
+                <p class="status out">Out of Order</p>
+                <button>Update</button>
+                <button>Remove</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
 </html>
