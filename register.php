@@ -68,13 +68,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
 
-<title>Create Account</title>
+<title style="color:white;">Create Account</title>
 
 <style>
 
 body{
     text-align:center;
     font-family: Arial;
+    background: url('images/laundry.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
 
 h1{
@@ -116,8 +118,8 @@ button{
 
 <body>
 
-<h1>Laundry System</h1>
-<h2>Create Account</h2>
+<h1 style="color:white;">Laundry System</h1>
+<h2 style="color:white;">Create Account</h2>
 
 <?php
 if(isset($error) && $error != ""){
@@ -140,6 +142,10 @@ if(isset($error) && $error != ""){
 <input type="password" name="confirm_password" required><br><br>
 
 <button type="submit">Create Account</button>
+
+<p>Already have an account? 
+    <a href="login.php">Login here</a>
+</p>
 
 </form>
 
