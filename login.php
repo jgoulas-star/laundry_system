@@ -37,40 +37,101 @@ if (isset($_POST['login'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Login</title>
 
 <style>
-body{
-    text-align:center;
-    font-family: Arial;
-    background: url('images/laundry.jpg') no-repeat center center fixed;
-    background-size: cover;
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-form{
-    display:inline-block;
-    text-align:left;
-    margin-top:30px;
-    background:#f4f4f4;
-    padding:20px;
-    border-radius:10px;
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    width: 350px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
 }
 
-input{
-    width:200px;
-    padding:5px;
+h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #2c3e50;
 }
 
-button{
-    margin-top:10px;
-    padding:6px 12px;
+h2 {
+    margin-top: 10px;
+    font-size: 20px;
+    color: #555;
 }
 
-.error{
-    color:red;
-    font-weight:bold;
+form {
+    margin-top: 25px;
+    text-align: left;
+}
+
+label {
+    font-size: 14px;
+    color: #333;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.2s;
+    box-sizing: border-box;
+}
+
+input:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52,152,219,0.5);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #3498db;
+    border: none;
+    color: white;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+button.secondary {
+    background: #95a5a6;
+}
+
+button.secondary:hover {
+    background: #7f8c8d;
+}
+
+.error {
+    color: #e74c3c;
+    margin: 10px 0 0 0;
+    text-align: center;
+    font-size: 14px;
 }
 </style>
 
@@ -78,30 +139,31 @@ button{
 
 <body>
 
-<h1>Laundry System</h1>
-<h2>Login</h2>
+<div class="card">
+    <h1>Laundry System</h1>
+    <h2>Login</h2>
 
-<?php
-if ($error != "") {
-    echo "<p class='error'>$error</p>";
-}
-?>
+    <?php if ($error): ?>
+        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+    <?php endif; ?>
 
-<form method="POST">
+    <form method="POST">
 
-<label>Email</label><br>
-<input type="email" name="email" required><br><br>
+        <label>Email</label>
+        <input type="email" name="email" required
+               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
 
-<label>Password</label><br>
-<input type="password" name="password" required><br><br>
+        <label>Password</label>
+        <input type="password" name="password" required>
 
-<button name="login">Login</button>
+        <button type="submit" name="login">Login</button>
 
-</form>
+        <button type="button" class="secondary" onclick="window.location.href='register.php'">
+            Create Account
+        </button>
 
-<p>Don't have an account? 
-    <a href="register.php">Register here</a>
-</p>
+    </form>
+</div>
 
 </body>
 </html>
