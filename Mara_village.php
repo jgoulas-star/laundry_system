@@ -172,7 +172,7 @@ button{
 
                 <p class="status available">Available</p>
 
-                <button class="reserve" onclick="goRegister()">Reserve</button>
+               
             </div>
 
             <!-- In Use Machine -->
@@ -198,12 +198,6 @@ button{
     </div>
 
 </div>
-
-<script>
-function goRegister(){
-    window.location.href = "register.php";
-}
-</script>
 
 </body>
 </html>

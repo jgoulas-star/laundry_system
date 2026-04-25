@@ -116,15 +116,6 @@ button{
     border-radius:5px;
 }
 
-/* Reserve button */
-.reserve{
-    background:#1abc9c;
-    color:white;
-}
-
-.reserve:hover{
-    background:#16a085;
-}
 
 </style>
 
@@ -172,7 +163,7 @@ button{
 
                 <p class="status available">Available</p>
 
-                <button class="reserve" onclick="goRegister()">Reserve</button>
+                
             </div>
 
             <!-- In Use Machine -->
@@ -199,11 +190,6 @@ button{
 
 </div>
 
-<script>
-function goRegister(){
-    window.location.href = "register.php";
-}
-</script>
 
 </body>
 </html>

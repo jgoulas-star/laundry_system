@@ -141,10 +141,10 @@ button:hover{
     <div class="sidebar">
         <h3>Buildings</h3>
 
-        <a href="register.php">Townhouses</a>
-        <a href="register.php">Aubuchon Hall</a>
-        <a href="register.php">Russell Towers</a>
-        <a href="register.php">Mara Village</a>
+        <a href="Townhouses.php">Townhouses</a>
+        <a href="Aubuchon_hall.php">Aubuchon Hall</a>
+        <a href="Russell_tower.php">Russell Towers</a>
+        <a href="Mara_village.php">Mara Village</a>
     </div>
 
     <!-- Main -->
