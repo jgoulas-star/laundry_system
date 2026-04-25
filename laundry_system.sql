@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 13, 2026 at 02:36 AM
+-- Generation Time: Apr 25, 2026 at 03:56 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,9 +41,14 @@ CREATE TABLE `laundry_cycles` (
 --
 
 INSERT INTO `laundry_cycles` (`cycle_id`, `user_id`, `machine_Id`, `start_time`, `end_time`, `cycle_status`) VALUES
-(1, 1, 2, '2026-04-13 00:06:54', '2026-04-12 18:13:50', 'finished'),
-(2, 1, 2, '2026-04-13 00:29:56', '2026-04-13 00:30:56', 'running'),
-(3, 1, 2, '2026-04-13 02:21:04', '2026-04-13 02:22:04', 'running');
+(23, 1, 6, '2026-04-24 21:23:23', '2026-04-24 21:24:23', 'finished'),
+(24, 1, 6, '2026-04-24 21:25:14', '2026-04-24 21:26:14', 'finished'),
+(25, 1, 7, '2026-04-24 21:27:26', '2026-04-24 21:28:26', 'finished'),
+(26, 1, 6, '2026-04-24 21:27:33', '2026-04-24 21:28:33', 'finished'),
+(27, 1, 6, '2026-04-24 21:31:03', '2026-04-24 21:32:03', 'finished'),
+(28, 1, 5, '2026-04-24 21:32:31', '2026-04-24 21:33:31', 'finished'),
+(29, 1, 2, '2026-04-24 21:34:11', '2026-04-24 21:35:11', 'finished'),
+(30, 1, 4, '2026-04-24 21:34:24', '2026-04-24 21:35:24', 'finished');
 
 -- --------------------------------------------------------
 
@@ -65,8 +70,14 @@ CREATE TABLE `machines` (
 --
 
 INSERT INTO `machines` (`machine_ID`, `machine_number`, `machine_type`, `status`, `location`, `added_at`) VALUES
-(1, 'W1', 'washer', 'available', 'Russell Tower', '2026-04-13 00:23:10'),
-(2, 'D1', 'dryer', 'available', 'Russell Tower', '2026-04-13 00:23:16');
+(1, 'W1', 'washer', 'available', 'Russell Tower', '2026-04-24 23:22:35'),
+(2, 'D1', 'dryer', 'available', 'Russell Tower', '2026-04-25 01:34:40'),
+(3, 'W1', 'washer', 'available', 'TownHouses', '2026-04-24 23:22:36'),
+(4, 'D1', 'dryer', 'available', 'TownHouses', '2026-04-25 01:34:39'),
+(5, 'W1', 'washer', 'available', 'Aubuchon Hall', '2026-04-25 01:34:07'),
+(6, 'D1', 'dryer', 'available', 'Aubuchon Hall', '2026-04-25 01:32:31'),
+(7, 'W1', 'washer', 'available', 'Mara Village', '2026-04-25 01:27:30'),
+(8, 'D1', 'dryer', 'available', 'Mara Village', '2026-04-25 01:29:58');
 
 -- --------------------------------------------------------
 
@@ -118,8 +129,14 @@ CREATE TABLE `reservations` (
 --
 
 INSERT INTO `reservations` (`Reservation_ID`, `user_id`, `machine_Id`, `reservation_start`, `reservation_end`, `status`) VALUES
-(7, 1, 2, '2026-04-13 00:29:56', '2026-04-13 00:30:56', 'active'),
-(8, 1, 2, '2026-04-13 02:21:04', '2026-04-13 02:22:04', 'active');
+(13, 1, 5, '2026-04-25 01:20:15', '2026-04-25 01:21:15', 'cancelled'),
+(14, 1, 3, '2026-04-25 01:20:30', '2026-04-25 01:21:30', 'cancelled'),
+(15, 1, 1, '2026-04-25 01:20:40', '2026-04-25 01:21:40', 'cancelled'),
+(22, 1, 5, '2026-04-24 20:40:29', '2026-04-24 20:41:29', 'active'),
+(27, 1, 5, '2026-04-24 21:21:14', '2026-04-24 21:22:14', 'active'),
+(31, 1, 6, '2026-04-24 21:27:33', '2026-04-24 21:28:33', 'active'),
+(32, 1, 6, '2026-04-24 21:31:03', '2026-04-24 21:32:03', 'active'),
+(33, 1, 5, '2026-04-24 21:32:31', '2026-04-24 21:33:31', 'active');
 
 -- --------------------------------------------------------
 
@@ -198,25 +215,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `laundry_cycles`
 --
 ALTER TABLE `laundry_cycles`
-  MODIFY `cycle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `cycle_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `machines`
 --
 ALTER TABLE `machines`
-  MODIFY `machine_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `machine_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `machine_reports`
 --
 ALTER TABLE `machine_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `reservations`
 --
 ALTER TABLE `reservations`
-  MODIFY `Reservation_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `Reservation_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `users`
