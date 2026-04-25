@@ -65,7 +65,7 @@ body{
 }
 
 .sidebar a:hover{
-    background:#1abc9c;
+    background:#0d6efd;
 }
 
 /* Main */

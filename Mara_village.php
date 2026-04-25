@@ -65,7 +65,7 @@ body{
 }
 
 .sidebar a:hover{
-    background:#1abc9c;
+    background:#0d6efd;
 }
 
 /* Main */
@@ -115,17 +115,6 @@ button{
     border:none;
     border-radius:5px;
 }
-
-/* Reserve button */
-.reserve{
-    background:#1abc9c;
-    color:white;
-}
-
-.reserve:hover{
-    background:#16a085;
-}
-
 </style>
 
 </head>

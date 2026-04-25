@@ -11,7 +11,7 @@
 body{
     font-family: Arial;
     margin:0;
-    background: url('images/laundry.jpg') no-repeat center center fixed;
+    background: white;
     background-size: cover;
 }
 
@@ -65,7 +65,7 @@ body{
 }
 
 .sidebar a:hover{
-    background:#1abc9c;
+    background: #0d6efd;
 }
 
 /* Main (empty for home) */
@@ -108,8 +108,8 @@ body{
 
     <!-- Main -->
     <div class="main">
-        <h1>Welcome</h1>
-        <p>Select a building to view available machines.</p>
+        <h1 style = "color: black">Welcome</h1>
+        <h2 style = "color: black">Select a building to view available machines.</h2>
     </div>
 
 </div>
