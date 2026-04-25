@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set("America/New_York");
 if (!isset($_SESSION['user_id'])) {
     header("Location: student_login.php");
     exit();
@@ -9,12 +10,10 @@ require_once("db.php");
 
 $user_id = $_SESSION['user_id'];
 
-/* Find finished laundry cycles */
 $finished = $conn->query("
-    SELECT cycle_id, machine_Id
+    SELECT cycle_id, machine_Id, user_id
     FROM laundry_cycles
-    WHERE user_id = $user_id
-    AND cycle_status = 'running'
+    WHERE cycle_status = 'running'
     AND end_time <= NOW()
 ");
 
@@ -22,27 +21,26 @@ while ($row = $finished->fetch_assoc()) {
 
     $cycle_id = $row['cycle_id'];
     $machine_id = $row['machine_Id'];
+    $cycle_user = $row['user_id'];
 
-    // mark cycle as finished
     $conn->query("
         UPDATE laundry_cycles
         SET cycle_status = 'finished'
         WHERE cycle_id = $cycle_id
     ");
 
-    // insert notification
     $conn->query("
         INSERT INTO notification (user_id, message)
-        VALUES ($user_id, 'Your laundry is done!')
+        VALUES ($cycle_user, 'Your laundry is done!')
     ");
 
-    // free machine
     $conn->query("
         UPDATE machines
         SET status = 'available'
         WHERE machine_ID = $machine_id
     ");
 }
+
 $notifications = $conn->query("
     SELECT * FROM notification
     WHERE user_id = $user_id
@@ -50,28 +48,34 @@ $notifications = $conn->query("
     LIMIT 5
 ");
 
-// Machine stats
 $available = $conn->query("SELECT COUNT(*) AS total FROM machines WHERE status = 'available'")->fetch_assoc()['total'];
 $in_use = $conn->query("SELECT COUNT(*) AS total FROM machines WHERE status = 'in_use'")->fetch_assoc()['total'];
 $out_of_order = $conn->query("SELECT COUNT(*) AS total FROM machines WHERE status = 'out_of_order'")->fetch_assoc()['total'];
 
-// Buildings
-$locations_result = $conn->query("SELECT DISTINCT location FROM machines WHERE location IS NOT NULL AND location != '' ORDER BY location");
+$locations_result = $conn->query("
+    SELECT DISTINCT location 
+    FROM machines 
+    WHERE location IS NOT NULL AND location != '' 
+    ORDER BY location
+");
+
 $dorm_buildings = [];
 while ($row = $locations_result->fetch_assoc()) {
     $dorm_buildings[] = $row['location'];
 }
+
 if (empty($dorm_buildings)) {
     $dorm_buildings = ['Russell Tower', 'TownHouses', 'Aubuchon Hall', 'Mara Village'];
 }
 
-// Machines
+
 $machines = $conn->query("
     SELECT machine_ID, machine_number, machine_type, location, status
     FROM machines
     ORDER BY location, machine_number
 ");
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -287,9 +291,9 @@ $machines = $conn->query("
             <h2>Laundry</h2>
             <ul>
                 <li><a href="student_page.php" class="active">Dashboard</a></li>
-                <li><a href="#">My Laundry</a></li>
+                <li><a href="my_laundry.php">My Laundry</a></li>
                 <li>
-                    <a href="#">
+                    <a href="notifications.php">
                         Notifications
                         <?php if ($notifications->num_rows > 0): ?>
                             (<?php echo $notifications->num_rows; ?>)
@@ -331,7 +335,18 @@ $machines = $conn->query("
                 <?php foreach ($dorm_buildings as $dorm): ?>
                     <div class="dorm-card">
                         <h4><?php echo htmlspecialchars($dorm); ?></h4>
-                        <a href="Building_dashboard.php?building=<?php echo urlencode($dorm); ?>">
+                        <?php
+                        $links = [
+                            "Russell Tower" => "russell_tower.php",
+                            "TownHouses" => "townhouses.php",
+                            "Aubuchon Hall" => "aubuchon.php",
+                            "Mara Village" => "mara_village.php"
+                        ];
+
+                        $page = $links[$dorm] ?? "building_view.php?building=" . urlencode($dorm);
+                        ?>
+
+                        <a href="<?php echo $page; ?>">
                             View Machines
                         </a>
                     </div>
@@ -360,12 +375,19 @@ $machines = $conn->query("
                                     <?php echo ucfirst(str_replace('_', ' ', $row['status'])); ?>
                                 </td>
                                 <td>
+
                                     <?php if ($row['status'] == 'available'): ?>
-                                        <a href="reserve_machine.php?id=<?php echo $row['machine_ID']; ?>" 
-                                           style="background:#27ae60;color:white;padding:6px 10px;border-radius:5px;text-decoration:none;font-size:13px;">
-                                            Reserve
-                                        </a>
+                                        <form method="POST" action="reserve_machine.php" style="display:inline;">
+                                            <input type="hidden" name="machine_id" value="<?php echo $row['machine_ID']; ?>">
+                                            <input type="hidden" name="redirect" value="student_page.php">
+
+                                            <button type="submit"
+                                                    style="background:#27ae60;color:white;padding:6px 10px;border-radius:5px;text-decoration:none;font-size:13px;border:none;cursor:pointer;">
+                                                Reserve
+                                            </button>
+                                        </form>
                                     <?php endif; ?>
+
                                     <button type="button"
                                             onclick="document.getElementById('report-<?php echo $row['machine_ID']; ?>').style.display = 'block'"
                                             style="background:#e74c3c;color:white;padding:6px 10px;border:none;border-radius:5px;cursor:pointer;">
