@@ -1,7 +1,22 @@
 <?php
 require_once("db.php");
 
-// Handle form
+// Fetch buildings for sidebar
+$buildings = [];
+$result = $conn->query("
+    SELECT DISTINCT location 
+    FROM machines 
+    WHERE location IS NOT NULL AND location != ''
+    ORDER BY location
+");
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $buildings[] = $row['location'];
+    }
+}
+
+// Handle form submission
 $success = '';
 $error = '';
 
@@ -42,14 +57,13 @@ body{
     background:#f4f7fc;
 }
 
-/* TOP NAVBAR */
+/* Navbar */
 .navbar{
     background:#2c3e50;
     color:white;
     padding:15px 25px;
     display:flex;
     justify-content:space-between;
-    align-items:center;
 }
 .navbar a{
     color:white;
@@ -66,13 +80,13 @@ body{
     display:flex;
 }
 
-/* Sidebar (from second code) */
+/* Sidebar */
 .sidebar {
     width: 250px;
     background: #2c3e50;
     color: white;
     padding: 20px;
-    min-height: calc(100vh - 60px); /* prevents overlap with navbar */
+    min-height: calc(100vh - 60px);
 }
 
 .sidebar h2 {
@@ -99,11 +113,9 @@ body{
 .sidebar ul li a {
     color: #ecf0f1;
     text-decoration: none;
-    font-size: 14px;
     display: block;
     padding: 10px;
     border-radius: 6px;
-    transition: 0.2s;
 }
 
 .sidebar ul li a:hover {
@@ -122,8 +134,8 @@ body{
 /* Contact box */
 .contact-box{
     background:white;
-    padding:35px;
-    border-radius:12px;
+    padding:30px;
+    border-radius:10px;
     width:100%;
     max-width:500px;
     box-shadow:0 10px 25px rgba(0,0,0,0.1);
@@ -155,34 +167,35 @@ button:hover{
     background:#1abc9c;
 }
 
-.success{ color:#27ae60; text-align:center; margin-top:10px; }
-.error{ color:#e74c3c; text-align:center; margin-top:10px; }
-
+.success{ color:#27ae60; text-align:center; }
+.error{ color:#e74c3c; text-align:center; }
 </style>
 </head>
 
 <body>
 
-<!--navbar-->
+<!-- Navbar -->
 <div class="navbar">
     <div><strong>Laundry System</strong></div>
     <div>
-       
     </div>
 </div>
 
 <div class="wrapper">
 
-    <!--sidebar-->
+    <!-- Sidebar -->
     <div class="sidebar">
         <h2>🧺 Laundry Status</h2>
 
         <h3>Buildings</h3>
         <ul>
-            <li><a href="Townhouses.php">Townhouses</a></li>
-            <li><a href="Aubuchon_hall.php">Aubuchon Hall</a></li>
-            <li><a href="Russell_tower.php">Russell Towers</a></li>
-            <li><a href="Mara_village.php">Mara Village</a></li>
+            <?php foreach ($buildings as $b): ?>
+                <li>
+                    <a href="building.php?location=<?php echo urlencode($b); ?>">
+                        <?php echo htmlspecialchars($b); ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
         </ul>
 
         <h3>Account</h3>
