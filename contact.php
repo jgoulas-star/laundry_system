@@ -1,187 +1,223 @@
 <?php
-session_start();
+require_once("db.php");
 
-$conn = new mysqli("localhost", "root", "", "laundry_system");
+// Handle form
+$success = '';
+$error = '';
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name  = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $msg   = trim($_POST['message']);
+
+    if (empty($name) || empty($email) || empty($msg)) {
+        $error = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Enter a valid email.";
+    } else {
+        $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $name, $email, $msg);
+
+        if ($stmt->execute()) {
+            $success = "Message sent successfully!";
+        } else {
+            $error = "Something went wrong.";
+        }
+
+        $stmt->close();
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
 <title>Contact Us</title>
 
 <style>
+* { margin:0; padding:0; box-sizing:border-box; }
 
 body{
     font-family: Arial;
-    margin:0;
-    background-color:#f4f4f4;
-    
+    background:#f4f7fc;
 }
 
-/* Navbar */
+/* TOP NAVBAR */
 .navbar{
-    background-color:#2c3e50;
+    background:#2c3e50;
     color:white;
-    padding:15px;
+    padding:15px 25px;
     display:flex;
     justify-content:space-between;
+    align-items:center;
 }
-
 .navbar a{
     color:white;
-    margin:0 10px;
+    margin-left:15px;
     text-decoration:none;
     font-weight:bold;
 }
-
 .navbar a:hover{
     color:#1abc9c;
 }
 
 /* Layout */
-.container{
+.wrapper{
     display:flex;
 }
 
-/* Sidebar */
-.sidebar{
-    width:220px;
-    background:#34495e;
-    color:white;
-    height:100vh;
-    padding-top:20px;
+/* Sidebar (from second code) */
+.sidebar {
+    width: 250px;
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    min-height: calc(100vh - 60px); /* prevents overlap with navbar */
 }
 
-.sidebar h3{
-    text-align:center;
+.sidebar h2 {
+    margin-bottom: 25px;
+    font-size: 22px;
+    border-bottom: 1px solid #3d566e;
+    padding-bottom: 10px;
 }
 
-.sidebar a{
-    display:block;
-    color:white;
-    padding:12px;
-    margin:5px;
-    text-decoration:none;
-    background:#2c3e50;
-    text-align:center;
-    border-radius:5px;
+.sidebar h3 {
+    margin: 20px 0 10px;
+    font-size: 15px;
+    color: #bdc3c7;
 }
 
-.sidebar a:hover{
-    background:#1abc9c;
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    margin-bottom: 8px;
+}
+
+.sidebar ul li a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 14px;
+    display: block;
+    padding: 10px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.sidebar ul li a:hover {
+    background: #3498db;
 }
 
 /* Main */
-.main{
+.main-content{
     flex:1;
-    padding:30px;
     display:flex;
-    justify-content:center;   /* horizontal center */
-    align-items:center;       /* vertical center */
-    
+    justify-content:center;
+    align-items:center;
+    padding:30px;
 }
 
-/* Form */
+/* Contact box */
 .contact-box{
     background:white;
-    padding:25px;
-    border-radius:8px;
+    padding:35px;
+    border-radius:12px;
+    width:100%;
     max-width:500px;
-    box-shadow:0px 2px 5px rgba(0,0,0,0.2);
-    
-    
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
 .contact-box h2{
-    margin-bottom:15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
+    text-align:center;
+    margin-bottom:20px;
 }
 
 input, textarea{
     width:100%;
-    padding:10px;
-    margin:10px 0;
+    padding:12px;
+    margin-bottom:15px;
     border:1px solid #ccc;
-    border-radius:5px;
+    border-radius:6px;
 }
 
 button{
+    width:100%;
+    padding:12px;
     background:#2c3e50;
     color:white;
-    padding:10px;
     border:none;
-    border-radius:5px;
+    border-radius:6px;
     cursor:pointer;
-    width:100%;
 }
-
 button:hover{
     background:#1abc9c;
 }
+
+.success{ color:#27ae60; text-align:center; margin-top:10px; }
+.error{ color:#e74c3c; text-align:center; margin-top:10px; }
 
 </style>
 </head>
 
 <body>
 
-<!-- Navbar -->
+<!--navbar-->
 <div class="navbar">
-    <div>Laundry System</div>
-
+    <div><strong>Laundry System</strong></div>
     <div>
-        <a href="guest.php">Home</a>
-        <a href="contact.php">Contact</a>
-        <a href="register.php">Sign Up</a>
-        <a href="login.php">Login</a>
+       
     </div>
 </div>
 
-<div class="container">
+<div class="wrapper">
 
-    <!-- Sidebar -->
+    <!--sidebar-->
     <div class="sidebar">
-        <h3>Buildings</h3>
+        <h2>🧺 Laundry Status</h2>
 
-        <a href="Townhouses.php">Townhouses</a>
-        <a href="Aubuchon_hall.php">Aubuchon Hall</a>
-        <a href="Russell_tower.php">Russell Towers</a>
-        <a href="Mara_village.php">Mara Village</a>
+        <h3>Buildings</h3>
+        <ul>
+            <li><a href="Townhouses.php">Townhouses</a></li>
+            <li><a href="Aubuchon_hall.php">Aubuchon Hall</a></li>
+            <li><a href="Russell_tower.php">Russell Towers</a></li>
+            <li><a href="Mara_village.php">Mara Village</a></li>
+        </ul>
+
+        <h3>Account</h3>
+        <ul>
+            <li><a href="guest.php">Home</a></li>
+            <li><a href="register.php">Sign Up</a></li>
+            <li><a href="login.php">Login</a></li>
+        </ul>
     </div>
 
     <!-- Main -->
-    <div class="main">
-
+    <div class="main-content">
         <div class="contact-box">
             <h2>Contact Us</h2>
 
-            <form action="contact.php" method="POST">
-                <input type="text" name="name" placeholder="Your Name" required>
+            <form method="POST">
+                <input type="text" name="name" placeholder="Your Name" required
+                    value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
 
-                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="email" name="email" placeholder="Your Email" required
+                    value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
 
-                <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+                <textarea name="message" rows="5" placeholder="Your Message" required><?php
+                    echo isset($_POST['message']) ? htmlspecialchars($_POST['message']) : '';
+                ?></textarea>
 
                 <button type="submit">Send Message</button>
             </form>
 
-            <?php
-            if($_SERVER["REQUEST_METHOD"] == "POST"){
-                $name = $_POST['name'];
-                $email = $_POST['email'];
-                $message = $_POST['message'];
-
-                echo "<p style='color:green; margin-top:10px;'>Message sent!</p>";
-            }
-            ?>
-
+            <?php if ($success): ?>
+                <p class="success"><?php echo $success; ?></p>
+            <?php elseif ($error): ?>
+                <p class="error"><?php echo $error; ?></p>
+            <?php endif; ?>
         </div>
-
     </div>
 
 </div>
