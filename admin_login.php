@@ -4,12 +4,8 @@ require_once(__DIR__ . "/db.php");
 
 $error = "";
 
-if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['user_role'] === 'admin') {
-        header("Location: student_login.php");
-    } else {
-        header("Location: student_login.php");
-    }
+if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'admin') {
+    header("Location: admin_login.php");
     exit();
 }
 
@@ -28,18 +24,16 @@ if (isset($_POST['login'])) {
         if ($result->num_rows === 1) {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id']    = $user['user_ID'];
-                $_SESSION['user_name']  = $user['name'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_role']  = $user['role'];
-
-                // Redirect based on role
-                if ($user['role'] === 'admin') {
-                    header("Location: main_admin_page.php");
+                if ($user['role'] !== 'admin') {
+                    $error = "Access denied. This account is not an administrator.";
                 } else {
-                    header("Location: student_dashboard.php");
+                    $_SESSION['user_id']    = $user['user_ID'];
+                    $_SESSION['user_name']  = $user['name'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_role']  = $user['role'];
+                    header("Location: main_admin_page.php");
+                    exit();
                 }
-                exit();
             } else {
                 $error = "Incorrect password.";
             }
@@ -54,7 +48,8 @@ if (isset($_POST['login'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Laundry System</title>
     <style>
         body {
             margin: 0;
@@ -70,30 +65,41 @@ if (isset($_POST['login'])) {
             padding: 40px;
             border-radius: 12px;
             width: 350px;
-            text-align: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
         }
-        h2 { margin-bottom: 20px; color: #2c3e50; }
+        h1 { margin: 0; font-size: 28px; color: #2c3e50; }
+        h2 { margin-top: 10px; font-size: 20px; color: #555; }
+        form { margin-top: 25px; text-align: left; }
+        label { font-size: 14px; color: #333; }
         input {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
-            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 15px;
             border-radius: 6px;
             border: 1px solid #ccc;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52,152,219,0.5);
         }
         button {
             width: 100%;
             padding: 12px;
-            margin-top: 12px;
             background: #3498db;
-            color: white;
             border: none;
+            color: white;
+            font-size: 16px;
             border-radius: 6px;
             cursor: pointer;
+            margin-top: 10px;
         }
         button:hover { background: #2980b9; }
-        .error { color: #e74c3c; margin-top: 10px; }
+        .error { color: #e74c3c; margin-top: 10px; font-size: 14px; }
         .back-link {
             display: block;
             margin-top: 15px;
@@ -104,21 +110,23 @@ if (isset($_POST['login'])) {
 </head>
 <body>
 <div class="card">
-    <h2>Student Login</h2>
+    <h1>Laundry System</h1>
+    <h2>Admin Login</h2>
     <?php if ($error): ?>
-        <div class="error"><?php echo htmlspecialchars($error); ?></div>
+        <p class="error"><?php echo htmlspecialchars($error); ?></p>
     <?php endif; ?>
     <form method="POST">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required
+               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
         <button type="submit" name="login">Login</button>
-    </form>
-    <button onclick="window.location.href='create_account.php'">Create Account</button>
-    <button class="btn-view" onclick="window.location.href='forgot_password.php'">
+        <button class="btn-view" onclick="window.location.href='forgot_password.php'">
      Forgot Password
     </button>
+    </form>
     <a href="first_page.php" class="back-link">&larr; Back to Home</a>
-    
 </div>
 </body>
 </html>
