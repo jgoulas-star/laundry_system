@@ -11,8 +11,7 @@ body{
     font-family: Arial;
     background-color:#f4f4f4;
     margin:0;
-    background: url('images/laundry.jpg') no-repeat center center fixed;
-    background-size: cover;
+
 }
 
 /* Navbar */
@@ -149,7 +148,7 @@ button{
     <!-- Main -->
     <div class="main">
 
-        <h2 style = "color: white">Aubuchon</h2>
+        <h2 style = "color: black">Aubuchon</h2>
 
         <div class="machine-grid">
 

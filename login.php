@@ -1,172 +1,113 @@
-<?php
-session_start();
-
-$conn = new mysqli("localhost", "root", "", "laundry_system");
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$error = "";
-
-if (isset($_POST['login'])) {
-
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-
-    $stmt = $conn->prepare("SELECT password FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();
-
-        if (password_verify($password, $row['password'])) {
-            $_SESSION['user'] = $email;
-
-            header("Location: view.php");
-            exit();
-        } else {
-            $error = "Incorrect password.";
-        }
-    } else {
-        $error = "Account not found.";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laundry System</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-<style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
 
-.card {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    width: 350px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    text-align: center;
-}
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            color: #2c3e50;
+        }
 
-h1 {
-    margin: 0;
-    font-size: 28px;
-    color: #2c3e50;
-}
+        .subtitle {
+            color: #555;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
 
-h2 {
-    margin-top: 10px;
-    font-size: 20px;
-    color: #555;
-}
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
 
-form {
-    margin-top: 25px;
-    text-align: left;
-}
+        .btn-admin {
+            background: #2c3e50;
+        }
+        .btn-admin:hover {
+            background: #1a252f;
+        }
 
-label {
-    font-size: 14px;
-    color: #333;
-}
+        .btn-student {
+            background: #3498db;
+        }
+        .btn-student:hover {
+            background: #2980b9;
+        }
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    transition: 0.2s;
-    box-sizing: border-box;
-}
+        .btn-view {
+            background: #27ae60;
+        }
+        .btn-view:hover {
+            background: #1e8449;
+        }
 
-input:focus {
-    border-color: #3498db;
-    outline: none;
-    box-shadow: 0 0 5px rgba(52,152,219,0.5);
-}
+        .footer {
+            margin-top: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
 
-button {
-    width: 100%;
-    padding: 12px;
-    background: #3498db;
-    border: none;
-    color: white;
-    font-size: 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-    margin-top: 10px;
-}
-
-button:hover {
-    background: #2980b9;
-}
-
-button.secondary {
-    background: #95a5a6;
-}
-
-button.secondary:hover {
-    background: #7f8c8d;
-}
-
-.error {
-    color: #e74c3c;
-    margin: 10px 0 0 0;
-    text-align: center;
-    font-size: 14px;
-}
-</style>
-
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="card">
     <h1>Laundry System</h1>
-    <h2>Login</h2>
+    <div class="subtitle">Choose an option</div>
 
-    <?php if ($error): ?>
-        <p class="error"><?php echo htmlspecialchars($error); ?></p>
-    <?php endif; ?>
+    <button class="btn-admin" onclick="window.location.href='admin_login.php'">
+     Admin Login
+    </button>
 
-    <form method="POST">
+    <button class="btn-student" onclick="window.location.href='student_login.php'">
+     Student / Resident Login
+    </button>
 
-        <label>Email</label>
-        <input type="email" name="email" required
-               value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+    <button class="btn-view" onclick="window.location.href='guest.php'">
+     View Machine Status
+    </button>
+    
+    <button class="btn-view" onclick="window.location.href='forgot_password.php'">
+     Forgot Password
+    </button>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
-
-        <button type="submit" name="login">Login</button>
-        
-        <p style="text-align:center; margin-top:10px;">
-            <a href="forgot_password.php">Forgot Password?</a>
-           </p>
-
-        <button type="button" class="secondary" onclick="window.location.href='register.php'">
-            Create Account
-        </button>
-
-    </form>
+    <div class="footer">
+        Need an account?<br>
+        <a href="register.php">Create Account</a>
+    </div>
 </div>
 
 </body>

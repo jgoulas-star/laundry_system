@@ -1,5 +1,11 @@
 <?php
-// no session needed (guest view)
+session_start();
+
+$conn = new mysqli("localhost", "root", "", "laundry_system");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -12,7 +18,7 @@ body{
     font-family: Arial;
     margin:0;
     background: white;
-    background-size: cover;
+
 }
 
 /* Top Navbar */
@@ -68,7 +74,7 @@ body{
     background: #0d6efd;
 }
 
-/* Main (empty for home) */
+/* Main */
 .main{
     flex:1;
     padding:20px;

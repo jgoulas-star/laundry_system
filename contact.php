@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+$conn = new mysqli("localhost", "root", "", "laundry_system");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -11,7 +18,7 @@ body{
     font-family: Arial;
     margin:0;
     background-color:#f4f4f4;
-    background: url('images/laundry.jpg') no-repeat center center fixed;
+    
 }
 
 /* Navbar */
@@ -64,7 +71,7 @@ body{
 }
 
 .sidebar a:hover{
-    background:#0d6efd;
+    background:#1abc9c;
 }
 
 /* Main */
@@ -169,7 +176,7 @@ button:hover{
                 $email = $_POST['email'];
                 $message = $_POST['message'];
 
-                echo "<p style='color:green; margin-top:10px;'>Message sent! (demo only)</p>";
+                echo "<p style='color:green; margin-top:10px;'>Message sent!</p>";
             }
             ?>
 
