@@ -157,6 +157,10 @@ button.secondary:hover {
         <input type="password" name="password" required>
 
         <button type="submit" name="login">Login</button>
+        
+        <p style="text-align:center; margin-top:10px;">
+            <a href="forgot_password.php">Forgot Password?</a>
+           </p>
 
         <button type="button" class="secondary" onclick="window.location.href='register.php'">
             Create Account
