@@ -113,9 +113,11 @@ body{
 .sidebar ul li a {
     color: #ecf0f1;
     text-decoration: none;
+    font-size: 14px;
     display: block;
     padding: 10px;
     border-radius: 6px;
+    transition: 0.2s;
 }
 
 .sidebar ul li a:hover {
@@ -203,6 +205,7 @@ button:hover{
             <li><a href="guest.php">Home</a></li>
             <li><a href="register.php">Sign Up</a></li>
             <li><a href="login.php">Login</a></li>
+            <li><a href="contact.php">Contact</a></li>
         </ul>
     </div>
 

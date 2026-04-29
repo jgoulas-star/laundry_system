@@ -205,10 +205,7 @@ tr:hover{
 <div class="navbar">
     <div><strong>Laundry System</strong></div>
     <div>
-        <a href="guest.php">Home</a>
-        <a href="contact.php">Contact</a>
-        <a href="register.php">Sign Up</a>
-        <a href="login.php">Login</a>
+      
     </div>
 </div>
 
@@ -237,6 +234,7 @@ tr:hover{
             <li><a href="guest.php">Home</a></li>
             <li><a href="register.php">Sign Up</a></li>
             <li><a href="login.php">Login</a></li>
+            <li><a href="contact.php">Contact</a></li>
         </ul>
     </div>
 
