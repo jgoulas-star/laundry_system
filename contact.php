@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <h2>🧺 Laundry Status</h2>
+    <h2>Laundry Status</h2>
     <h3 style="margin-top: 30px;">Guest Access</h3>
     <ul>
         <li><a href="guest.php">Home</a></li>

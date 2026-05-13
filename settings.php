@@ -270,7 +270,7 @@ if ($conn->query("SHOW TABLES LIKE 'machine_reports'")->num_rows > 0) {
         <div class="settings-grid">
             <!-- Profile Settings -->
             <div class="settings-card">
-                <h2>👤 Profile Information</h2>
+                <h2>Profile Information</h2>
                 <form method="POST">
                     <div class="form-group">
                         <label for="name">Full Name</label>
@@ -288,7 +288,7 @@ if ($conn->query("SHOW TABLES LIKE 'machine_reports'")->num_rows > 0) {
 
             <!-- Change Password -->
             <div class="settings-card">
-                <h2>🔐 Change Password</h2>
+                <h2>Change Password</h2>
                 <form method="POST">
                     <div class="form-group">
                         <label for="current_password">Current Password</label>
@@ -309,7 +309,7 @@ if ($conn->query("SHOW TABLES LIKE 'machine_reports'")->num_rows > 0) {
 
             <!-- System Information -->
             <div class="settings-card">
-                <h2>📊 System Information</h2>
+                <h2>System Information</h2>
                 <div class="info-row">
                     <span class="info-label">Total Machines</span>
                     <span class="info-value"><?php echo $total_machines; ?></span>
@@ -334,7 +334,7 @@ if ($conn->query("SHOW TABLES LIKE 'machine_reports'")->num_rows > 0) {
 
             <!-- Maintenance -->
             <div class="settings-card">
-                <h2>🛠️ Maintenance</h2>
+                <h2>Maintenance</h2>
                 <p style="color: #7f8c8d; margin-bottom: 15px; font-size: 14px;">
                     Use these tools to manage system data.
                 </p>
@@ -353,7 +353,7 @@ if ($conn->query("SHOW TABLES LIKE 'machine_reports'")->num_rows > 0) {
 
             <!-- About -->
             <div class="settings-card">
-                <h2>ℹ️ About</h2>
+                <h2>About</h2>
                 <div class="info-row">
                     <span class="info-label">Application</span>
                     <span class="info-value">Laundry Management System</span>

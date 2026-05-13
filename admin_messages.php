@@ -192,7 +192,7 @@ $messages_result = $conn->query("SELECT * FROM contact_messages ORDER BY submitt
             </table>
         <?php else: ?>
             <div class="empty-state">
-                <p>📭 No messages received yet.</p>
+                <p> No messages received yet.</p>
             </div>
         <?php endif; ?>
     </div>

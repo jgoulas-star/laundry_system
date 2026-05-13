@@ -6,9 +6,9 @@ $error = "";
 
 if (isset($_SESSION['user_id'])) {
     if ($_SESSION['user_role'] === 'admin') {
-        header("Location: student_login.php");
+        header("Location: main_admin_page.php");
     } else {
-        header("Location: student_login.php");
+        header("Location: student_dashboard.php");
     }
     exit();
 }

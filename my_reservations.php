@@ -1,5 +1,9 @@
 <?php
+date_default_timezone_set('America/New_York');
 session_start();
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 require_once("db.php");
 
 // Must be logged in
@@ -9,6 +13,39 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+
+// --- Automatically expire past reservations ---
+$expire_stmt = $conn->prepare("
+    SELECT r.reservation_id, r.machine_id
+    FROM reservations r
+    WHERE r.user_id = ? AND r.status = 'active' AND r.reservation_end <= NOW()
+");
+$expire_stmt->bind_param("i", $user_id);
+$expire_stmt->execute();
+$expired = $expire_stmt->get_result();
+
+while ($exp = $expired->fetch_assoc()) {
+    $rid = $exp['reservation_id'];
+    $mid = $exp['machine_id'];
+
+    // Mark reservation as completed
+    $upd = $conn->prepare("UPDATE reservations SET status = 'completed' WHERE reservation_id = ?");
+    $upd->bind_param("i", $rid);
+    $upd->execute();
+    $upd->close();
+
+    // Free the machine if it's still in use
+    $free = $conn->prepare("UPDATE machines SET status = 'available' WHERE machine_ID = ? AND status = 'in_use'");
+    $free->bind_param("i", $mid);
+    $free->execute();
+    $free->close();
+}
+$expire_stmt->close();
+
+// Count unread notifications for the sidebar badge (FIX)
+$unread_result = $conn->query("SELECT COUNT(*) AS unread FROM notifications WHERE user_id = $user_id AND is_read = 0");
+$unread_count = $unread_result->fetch_assoc()['unread'];
+
 $message = '';
 $error = '';
 
@@ -213,11 +250,19 @@ $past_stmt->close();
 <div class="sidebar">
     <h2>Laundry</h2>
     <ul>
-        <li><a href="student_dashboard.php">Dashboard</a></li>
-        <li><a href="my_reservations.php" class="active">My Reservations</a></li>
-        <li><a href="student_notifications.php">Notifications</a></li>
-        <li><a href="student_settings.php">Settings</a></li>
-        <li><a href="logout.php">Logout</a></li>
+        <li><a href="student_dashboard.php" class="active">Dashboard</a></li>
+        <li><a href="my_reservations.php">My Reservations</a></li>
+        <li><a href="my_laundry.php">My Laundry</a></li>
+        <li>
+            <a href="notifications.php">
+                Notifications
+                <?php if ($unread_count > 0): ?>
+                    <span class="badge"><?php echo $unread_count; ?></span>
+                <?php endif; ?>
+            </a>
+            <li><a href="student_settings.php">Settings</a></li>
+            <li><a href="logout.php">Logout</a></li>
+        </li>
     </ul>
 </div>
 

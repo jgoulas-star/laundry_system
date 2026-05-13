@@ -2,7 +2,6 @@
 session_start();
 require_once("db.php");
 
-// Must be logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: student_login.php");
     exit();
@@ -10,29 +9,28 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// ===== HANDLE ACTIONS =====
-// Mark single notification as read
+// ------- Handle Mark as Read ----------
 if (isset($_GET['mark_read']) && is_numeric($_GET['mark_read'])) {
     $notif_id = (int)$_GET['mark_read'];
     $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE notification_id = ? AND user_id = ?");
     $stmt->bind_param("ii", $notif_id, $user_id);
     $stmt->execute();
     $stmt->close();
-    header("Location: student_notifications.php");
+    header("Location: notifications.php");
     exit();
 }
 
-// Clear all notifications for this user
+// ------- Handle Clear All (same page) ----------
 if (isset($_POST['clear_all'])) {
     $stmt = $conn->prepare("DELETE FROM notifications WHERE user_id = ?");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $stmt->close();
-    header("Location: student_notifications.php");
+    header("Location: notifications.php");
     exit();
 }
 
-// ===== FETCH NOTIFICATIONS =====
+// ------- Fetch notifications ----------
 $stmt = $conn->prepare("
     SELECT notification_id, title, message, is_read, created_at
     FROM notifications
@@ -44,7 +42,7 @@ $stmt->execute();
 $notifications = $stmt->get_result();
 $stmt->close();
 
-// ===== COUNT UNREAD (for badge) =====
+// ------- Unread count for badge ----------
 $count_stmt = $conn->prepare("SELECT COUNT(*) AS unread FROM notifications WHERE user_id = ? AND is_read = 0");
 $count_stmt->bind_param("i", $user_id);
 $count_stmt->execute();
@@ -55,109 +53,104 @@ $count_stmt->close();
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Notifications – Laundry System</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family:'Segoe UI', Arial;
-            background:#f4f7fc;
-            display:flex;
-            min-height:100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width:250px;
-            background:#2c3e50;
-            color:white;
-            padding:20px;
-        }
-        .sidebar h2 {
-            margin-bottom:30px;
-            border-bottom:1px solid #3d566e;
-            padding-bottom:15px;
-        }
-        .sidebar ul { list-style:none; padding:0; }
-        .sidebar ul li { margin-bottom:12px; }
-        .sidebar ul li a {
-            color:#ecf0f1;
-            text-decoration:none;
-            display:block;
-            padding:8px 12px;
-            border-radius:5px;
-        }
-        .sidebar ul li a:hover { background:#3498db; }
-        .badge {
-            background:#e74c3c;
-            color:white;
-            padding:2px 8px;
-            border-radius:10px;
-            font-size:12px;
-            margin-left:5px;
-        }
-
-        /* Main Content */
-        .main {
-            flex:1;
-            padding:30px;
-        }
-        .top-bar {
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:30px;
-        }
-        .top-bar h1 { color:#2c3e50; }
-        .btn {
-            padding:10px 20px;
-            border:none;
-            border-radius:5px;
-            text-decoration:none;
-            cursor:pointer;
-            font-size:14px;
-            font-weight:500;
-            transition:background 0.2s;
-            display:inline-block;
-        }
-        .btn-back { background:#95a5a6; color:white; }
-        .btn-back:hover { background:#7f8c8d; }
-        .btn-clear { background:#e74c3c; color:white; margin-left:10px; }
-        .btn-clear:hover { background:#c0392b; }
-
-        .card {
-            background:white;
-            padding:15px 20px;
-            border-radius:10px;
-            margin-bottom:10px;
-            box-shadow:0 2px 10px rgba(0,0,0,0.05);
-        }
-        .unread {
-            border-left:4px solid #3498db;
-            background:#f0f8ff;
-        }
-        .read {
-            border-left:4px solid transparent;
-        }
-        .notification-title { font-weight:600; color:#2c3e50; margin-bottom:4px; }
-        .notification-message { color:#555; font-size:14px; }
-        .notification-time { color:#95a5a6; font-size:12px; margin-top:5px; }
-        .actions { margin-top:8px; }
-        .actions a { color:#3498db; text-decoration:none; font-size:13px; }
-        .actions a:hover { text-decoration:underline; }
-        .empty-state { text-align:center; padding:40px; color:#7f8c8d; }
-    </style>
+<meta charset="UTF-8">
+<title>Notifications</title>
+<style>
+    body {
+        margin:0;
+        font-family:'Segoe UI', Arial;
+        background:#f4f7fc;
+        display:flex;
+        min-height:100vh;
+    }
+    .sidebar {
+        width:250px;
+        background:#2c3e50;
+        color:white;
+        padding:20px;
+    }
+    .sidebar h2 {
+        margin-bottom:30px;
+        border-bottom:1px solid #3d566e;
+        padding-bottom:15px;
+    }
+    .sidebar ul { list-style:none; padding:0; }
+    .sidebar ul li { margin-bottom:12px; }
+    .sidebar ul li a {
+        color:#ecf0f1;
+        text-decoration:none;
+        display:block;
+        padding:8px 12px;
+        border-radius:5px;
+    }
+    .sidebar ul li a:hover { background:#3498db; }
+    .badge {
+        background:#e74c3c;
+        color:white;
+        padding:2px 8px;
+        border-radius:10px;
+        font-size:12px;
+        margin-left:5px;
+    }
+    .main {
+        flex:1;
+        padding:30px;
+    }
+    .top-bar {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:30px;
+    }
+    .top-bar h1 { color:#2c3e50; }
+    .btn {
+        padding:10px 20px;
+        border:none;
+        border-radius:5px;
+        text-decoration:none;
+        cursor:pointer;
+        font-size:14px;
+        font-weight:500;
+        transition:background 0.2s;
+        display:inline-block;
+    }
+    .btn-back { background:#95a5a6; color:white; }
+    .btn-back:hover { background:#7f8c8d; }
+    .btn-clear { background:#e74c3c; color:white; margin-left:10px; }
+    .btn-clear:hover { background:#c0392b; }
+    .card {
+        background:white;
+        padding:15px 20px;
+        border-radius:10px;
+        margin-bottom:10px;
+        box-shadow:0 2px 10px rgba(0,0,0,0.05);
+    }
+    .unread {
+        border-left:4px solid #3498db;
+        background:#f0f8ff;
+    }
+    .read {
+        border-left:4px solid transparent;
+    }
+    .notification-title { font-weight:600; color:#2c3e50; margin-bottom:4px; }
+    .notification-message { color:#555; font-size:14px; }
+    .notification-time { color:#95a5a6; font-size:12px; margin-top:5px; }
+    .actions { margin-top:8px; }
+    .actions a { color:#3498db; text-decoration:none; font-size:13px; }
+    .actions a:hover { text-decoration:underline; }
+    .empty-state { text-align:center; padding:40px; color:#7f8c8d; }
+</style>
 </head>
 <body>
 
-<!-- Sidebar -->
 <div class="sidebar">
     <h2>Laundry</h2>
     <ul>
         <li><a href="student_dashboard.php">Dashboard</a></li>
         <li><a href="my_reservations.php">My Reservations</a></li>
+        <li><a href="my_laundry.php">My Laundry</a></li>
         <li>
-            <a href="student_notifications.php">
+            <a href="notifications.php">
                 Notifications
                 <?php if ($unread_count > 0): ?>
                     <span class="badge"><?php echo $unread_count; ?></span>
@@ -169,7 +162,6 @@ $count_stmt->close();
     </ul>
 </div>
 
-<!-- Main Content -->
 <div class="main">
     <div class="top-bar">
         <h1>Notifications</h1>

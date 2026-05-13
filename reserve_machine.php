@@ -1,8 +1,8 @@
 <?php
+date_default_timezone_set('America/New_York');
 session_start();
 require_once("db.php");
 
-// Must be logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: student_login.php");
     exit();
@@ -14,12 +14,12 @@ $error = '';
 
 // Handle reservation request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve'])) {
-    $machine_id = (int)$_POST['machine_id'];
+    $machine_id = isset($_POST['machine_id']) ? (int)$_POST['machine_id'] : 0;
     $duration   = isset($_POST['duration']) ? (int)$_POST['duration'] : 60;
 
     if ($machine_id <= 0) {
         $error = "Invalid machine selection.";
-    } elseif ($duration < 15 || $duration > 180) {
+    } elseif ($duration < 1 || $duration > 180) {
         $error = "Duration must be between 15 and 180 minutes.";
     } else {
         // Check if machine is available
@@ -34,19 +34,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve'])) {
         } elseif ($machine['status'] !== 'available') {
             $error = "Machine is not available right now.";
         } else {
-            // Create reservation
             $start = date("Y-m-d H:i:s");
             $end   = date("Y-m-d H:i:s", strtotime("+{$duration} minutes"));
 
             $conn->begin_transaction();
             try {
-                // Insert reservation
+                // 1. Insert reservation (reservations table uses machine_id lowercase)
                 $stmt = $conn->prepare("INSERT INTO reservations (user_id, machine_id, reservation_start, reservation_end, status) VALUES (?, ?, ?, ?, 'active')");
                 $stmt->bind_param("iiss", $user_id, $machine_id, $start, $end);
                 $stmt->execute();
                 $stmt->close();
 
-                // Update machine status
+                // 2. Insert laundry cycle (laundry_cycles table uses machine_Id with capital I)
+                $stmt2 = $conn->prepare("INSERT INTO laundry_cycles (user_id, machine_Id, start_time, end_time, cycle_status) VALUES (?, ?, ?, ?, 'running')");
+                $stmt2->bind_param("iiss", $user_id, $machine_id, $start, $end);
+                $stmt2->execute();
+                $stmt2->close();
+
+                // 3. Update machine status
                 $update = $conn->prepare("UPDATE machines SET status = 'in_use' WHERE machine_ID = ?");
                 $update->bind_param("i", $machine_id);
                 $update->execute();
@@ -57,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve'])) {
             } catch (Exception $e) {
                 $conn->rollback();
                 $error = "Reservation failed. Please try again.";
+                // Uncomment the next line to see the actual error during debugging
+                // $error .= " (Error: " . $e->getMessage() . ")";
             }
         }
     }
@@ -65,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve'])) {
 // Fetch available machines for dropdown
 $machines = $conn->query("SELECT machine_ID, machine_number, location, machine_type FROM machines WHERE status = 'available' ORDER BY location, machine_number");
 
-// Fetch user’s active reservations
+// Fetch user's active reservations
 $reservations = $conn->query("
     SELECT r.reservation_id, r.reservation_start, r.reservation_end, m.machine_number, m.machine_type, m.location
     FROM reservations r
@@ -80,7 +87,7 @@ $reservations = $conn->query("
     <meta charset="UTF-8">
     <title>Reserve Machine</title>
     <style>
-        body { font-family:'Segoe UI',Arial; background:#f4f7fc; display:flex; min-height:100vh; margin:0; }
+        body { font-family:'Segoe UI', Arial; background:#f4f7fc; display:flex; min-height:100vh; margin:0; }
         .sidebar { width:250px; background:#2c3e50; color:white; padding:20px; }
         .sidebar h2 { margin-bottom:30px; border-bottom:1px solid #3d566e; padding-bottom:15px; }
         .sidebar ul { list-style:none; padding:0; }
@@ -125,12 +132,12 @@ $reservations = $conn->query("
                 <option value="">-- Choose --</option>
                 <?php while($m = $machines->fetch_assoc()): ?>
                     <option value="<?php echo $m['machine_ID']; ?>">
-                        <?php echo $m['location'] . " - " . $m['machine_number'] . " (" . ucfirst($m['machine_type']) . ")"; ?>
+                        <?php echo htmlspecialchars($m['location'] . " - " . $m['machine_number'] . " (" . ucfirst($m['machine_type']) . ")"); ?>
                     </option>
                 <?php endwhile; ?>
             </select>
             <label>Duration (minutes, 15-180)</label>
-            <input type="number" name="duration" value="60" min="15" max="180" required style="width:100%; padding:8px; margin:10px 0;">
+            <input type="number" name="duration" value="60" min="1" max="180" required style="width:100%; padding:8px; margin:10px 0;">
             <button type="submit" name="reserve" class="btn btn-primary">Reserve</button>
         </form>
     </div>
@@ -142,10 +149,10 @@ $reservations = $conn->query("
                 <tr><th>Machine</th><th>Location</th><th>Started</th><th>Ends</th><th>Action</th></tr>
                 <?php while($r = $reservations->fetch_assoc()): ?>
                     <tr>
-                        <td><?php echo $r['machine_number']; ?></td>
-                        <td><?php echo $r['location']; ?></td>
-                        <td><?php echo date('H:i', strtotime($r['reservation_start'])); ?></td>
-                        <td><?php echo date('H:i', strtotime($r['reservation_end'])); ?></td>
+                        <td><?php echo htmlspecialchars($r['machine_number']); ?></td>
+                        <td><?php echo htmlspecialchars($r['location']); ?></td>
+                        <td><?php echo date('g:i A', strtotime($r['reservation_start'])); ?></td>
+                        <td><?php echo date('g:i A', strtotime($r['reservation_end'])); ?></td>
                         <td><a href="my_reservations.php?cancel=<?php echo $r['reservation_id']; ?>" class="btn btn-danger" style="padding:4px 8px;">Cancel</a></td>
                     </tr>
                 <?php endwhile; ?>

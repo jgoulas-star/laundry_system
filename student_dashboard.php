@@ -1,5 +1,8 @@
 <?php
 session_start();
+header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1
+header("Pragma: no-cache"); // HTTP 1.0
+header("Expires: 0"); // Proxies
 if (!isset($_SESSION['user_id'])) {
     header("Location: student_login.php");
     exit();
@@ -9,9 +12,37 @@ require_once("db.php");
 
 $user_id = $_SESSION['user_id'];
 
+// ===== NEW: Automatically expire past reservations =====
+$expire_stmt = $conn->prepare("
+    SELECT r.reservation_id, r.machine_id
+    FROM reservations r
+    WHERE r.user_id = ? AND r.status = 'active' AND r.reservation_end <= NOW()
+");
+$expire_stmt->bind_param("i", $user_id);
+$expire_stmt->execute();
+$expired = $expire_stmt->get_result();
+
+while ($exp = $expired->fetch_assoc()) {
+    $rid = $exp['reservation_id'];
+    $mid = $exp['machine_id'];
+
+    // Mark reservation as completed
+    $upd = $conn->prepare("UPDATE reservations SET status = 'completed' WHERE reservation_id = ?");
+    $upd->bind_param("i", $rid);
+    $upd->execute();
+    $upd->close();
+
+    // Free the machine if it's still in use
+    $free = $conn->prepare("UPDATE machines SET status = 'available' WHERE machine_ID = ? AND status = 'in_use'");
+    $free->bind_param("i", $mid);
+    $free->execute();
+    $free->close();
+}
+$expire_stmt->close();
+
 // --- Check for finished laundry cycles and create notifications ---
 $finished_stmt = $conn->prepare("
-    SELECT cycle_id, machine_id
+    SELECT cycle_id, machine_Id
     FROM laundry_cycles
     WHERE user_id = ? AND cycle_status = 'running' AND end_time <= NOW()
 ");
@@ -21,7 +52,7 @@ $finished_result = $finished_stmt->get_result();
 
 while ($row = $finished_result->fetch_assoc()) {
     $cycle_id = $row['cycle_id'];
-    $machine_id = $row['machine_id'];
+    $machine_id = $row['machine_Id'];  // use the correct case
 
     // Mark cycle finished
     $update_cycle = $conn->prepare("UPDATE laundry_cycles SET cycle_status = 'finished' WHERE cycle_id = ?");
@@ -35,7 +66,7 @@ while ($row = $finished_result->fetch_assoc()) {
     $notify_stmt->execute();
     $notify_stmt->close();
 
-    // Free up the machine
+    // Free up the machine (machines table uses machine_ID, so we keep it as machine_id variable but use the correct machine_ID column)
     $free_stmt = $conn->prepare("UPDATE machines SET status = 'available' WHERE machine_ID = ?");
     $free_stmt->bind_param("i", $machine_id);
     $free_stmt->execute();
@@ -248,8 +279,9 @@ $machines_result = $conn->query("
     <ul>
         <li><a href="student_dashboard.php" class="active">Dashboard</a></li>
         <li><a href="my_reservations.php">My Reservations</a></li>
+        <li><a href="my_laundry.php">My Laundry</a></li>
         <li>
-            <a href="student_notifications.php">
+            <a href="notifications.php">
                 Notifications
                 <?php if ($unread_count > 0): ?>
                     <span class="badge"><?php echo $unread_count; ?></span>
@@ -275,7 +307,8 @@ $machines_result = $conn->query("
                 <span style="font-size:12px; color:#555;">
                     (<?php echo date('g:i A', strtotime($n['created_at'])); ?>)
                 </span>
-                <a href="student_notifications.php?mark_read=<?php echo $n['notification_id']; ?>">Mark as read</a>
+                <!-- FIXED: link to notifications.php, which actually exists -->
+                <a href="notifications.php?mark_read=<?php echo $n['notification_id']; ?>">Mark as read</a>
             </div>
         <?php endwhile; ?>
     <?php endif; ?>

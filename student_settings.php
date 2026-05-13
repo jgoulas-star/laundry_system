@@ -1,5 +1,8 @@
 <?php
 session_start();
+header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1
+header("Pragma: no-cache"); // HTTP 1.0
+header("Expires: 0"); // Proxies
 require_once("db.php");
 
 // Must be logged in
@@ -9,6 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+$unread_result = $conn->query("SELECT COUNT(*) AS unread FROM notifications WHERE user_id = $user_id AND is_read = 0");
+$unread_count = $unread_result->fetch_assoc()['unread'];
 $message = '';
 $error = '';
 
@@ -216,10 +221,19 @@ if (isset($_POST['change_password'])) {
 <div class="sidebar">
     <h2>Laundry</h2>
     <ul>
-        <li><a href="student_dashboard.php">Dashboard</a></li>
+        <li><a href="student_dashboard.php" class="active">Dashboard</a></li>
         <li><a href="my_reservations.php">My Reservations</a></li>
-        <li><a href="student_notifications.php">Notifications</a></li>
-        <li><a href="student_settings.php" class="active">Settings</a></li>
+        <li><a href="my_laundry.php">My Laundry</a></li>
+        <li>
+            <a href="notifications.php">
+                Notifications
+                <?php if ($unread_count > 0): ?>
+                    <span class="badge"><?php echo $unread_count; ?></span>
+                <?php endif; ?>
+            </a>
+            <li><a href="student_settings.php">Settings</a></li>
+            <li><a href="logout.php">Logout</a></li>
+        </li>
     </ul>
 </div>
 

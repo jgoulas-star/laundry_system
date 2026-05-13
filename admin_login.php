@@ -5,7 +5,7 @@ require_once(__DIR__ . "/db.php");
 $error = "";
 
 if (isset($_SESSION['user_id']) && $_SESSION['user_role'] === 'admin') {
-    header("Location: admin_login.php");
+    header("Location: main_admin_page.php");
     exit();
 }
 
